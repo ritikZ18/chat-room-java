@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class RoomRegistry {
     private final ConcurrentHashMap<String, ChatRoom> rooms = new ConcurrentHashMap<>();
 
-    // computeIfAbsent is atomic — no duplicate ChatRoom even under concurrent bursts
+    /** computeIfAbsent is atomic — no duplicate ChatRoom under concurrent bursts. */
     public ChatRoom getOrCreate(String roomId) {
         return rooms.computeIfAbsent(roomId, ChatRoom::new);
     }
@@ -23,7 +23,5 @@ public class RoomRegistry {
         return false;
     }
 
-    public List<String> listRoomIds() {
-        return new ArrayList<>(rooms.keySet()); // snapshot — safe to iterate while map mutates
-    }
+    public List<String> listRoomIds() { return new ArrayList<>(rooms.keySet()); }
 }

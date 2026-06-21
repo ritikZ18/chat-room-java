@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class UserSession {
     private final User user;
     private final LinkedBlockingQueue<Message> inbox;
-    private volatile long lastHeartbeat;
+    private volatile long  lastHeartbeat;
     private final AtomicBoolean active = new AtomicBoolean(true);
 
     public UserSession(User user, int inboxCapacity) {
@@ -16,21 +16,18 @@ public class UserSession {
         this.lastHeartbeat = System.currentTimeMillis();
     }
 
-    // Non-blocking — returns false if inbox is full (slow client), never stalls the room
-    public boolean enqueue(Message msg) {
-        return inbox.offer(msg);
-    }
+    /** Non-blocking. Returns false if inbox full — never stalls the room dispatcher. */
+    public boolean enqueue(Message msg) { return inbox.offer(msg); }
 
     public Message poll(long timeout, TimeUnit unit) throws InterruptedException {
         return inbox.poll(timeout, unit);
     }
 
-    public void updateHeartbeat() { this.lastHeartbeat = System.currentTimeMillis(); }
-    public long getLastHeartbeat() { return lastHeartbeat; }
-
-    public User    getUser()     { return user; }
-    public boolean isActive()    { return active.get(); }
-    public void    deactivate()  { active.set(false); }
+    public void    updateHeartbeat()   { this.lastHeartbeat = System.currentTimeMillis(); }
+    public long    getLastHeartbeat()  { return lastHeartbeat; }
+    public User    getUser()           { return user; }
+    public boolean isActive()          { return active.get(); }
+    public void    deactivate()        { active.set(false); }
 
     @Override
     public String toString() { return "Session[" + user.username() + "]"; }
