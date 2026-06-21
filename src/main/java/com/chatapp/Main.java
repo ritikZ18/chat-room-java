@@ -10,10 +10,14 @@ import com.chatapp.service.ChatService;
 import java.util.Base64;
 import java.util.concurrent.TimeUnit;
 
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
 public class Main {
     public static void main(String[] args) throws InterruptedException {
-
-        ChatService chat = new ChatService("profiles/users.json");
+        SpringApplication.run(Main.class, args);
+        ChatService chat = new ChatService("data/profiles/users.json");
 
         // ── Tiny fake PNG as Base64 (1×1 red pixel) for demo purposes ──────
         // In real use: read an image file and encode it yourself:
