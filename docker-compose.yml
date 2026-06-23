@@ -1,0 +1,41 @@
+version: '3.9'
+
+services:
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: chatapp-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB:       chatapp
+      POSTGRES_USER:     chatapp
+      POSTGRES_PASSWORD: chatapp123
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./sql/init.sql:/docker-entrypoint-initdb.d/01_init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U chatapp -d chatapp"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    container_name: chatapp-app
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_URL:      jdbc:postgresql://postgres:5432/chatapp
+      DB_USER:     chatapp
+      DB_PASSWORD: chatapp123
+    volumes:
+      - ./data:/app/data   # profile JSON fallback
+
+volumes:
+  pgdata:
